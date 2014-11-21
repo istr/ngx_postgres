@@ -223,6 +223,7 @@ ngx_postgres_upstream_init_peer(ngx_http_request_t *r,
     return NGX_OK;
 
 failed:
+
 #if defined(nginx_version) && (nginx_version >= 8017)
     dd("returning NGX_ERROR");
     return NGX_ERROR;
@@ -465,10 +466,12 @@ ngx_postgres_upstream_get_peer(ngx_peer_connection_t *pc, void *data)
     return NGX_AGAIN;
 
 bad_add:
+
     ngx_log_error(NGX_LOG_ERR, pc->log, 0,
                   "postgres: failed to add nginx connection");
 
 invalid:
+
     ngx_postgres_upstream_free_connection(pc->log, pc->connection,
                                           pgdt->pgconn, pgscf);
 
@@ -478,6 +481,7 @@ invalid:
 #else
 
 failed:
+
     /* a bit hack-ish way to return error response (setup part) */
     pc->connection = ngx_get_connection(0, pc->log);
 
@@ -562,11 +566,19 @@ ngx_postgres_upstream_free_connection(ngx_log_t *log, ngx_connection_t *c,
             }
         }
 
+#if defined(nginx_version) && nginx_version >= 1007005
+        if (rev->posted) {
+#else
         if (rev->prev) {
+#endif
             ngx_delete_posted_event(rev);
         }
 
+#if defined(nginx_version) && nginx_version >= 1007005
+        if (wev->posted) {
+#else
         if (wev->prev) {
+#endif
             ngx_delete_posted_event(wev);
         }
 

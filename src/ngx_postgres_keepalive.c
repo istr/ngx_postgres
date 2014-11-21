@@ -292,6 +292,7 @@ ngx_postgres_keepalive_close_handler(ngx_event_t *ev)
     }
 
 close:
+
     pgscf = item->srv_conf;
 
     ngx_postgres_upstream_free_connection(ev->log, c, item->pgconn, pgscf);
